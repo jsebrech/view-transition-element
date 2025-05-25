@@ -16,34 +16,34 @@
 
 
 /* Slide animations for Suspense the fallback down */
-::view-transition-old(.slide-down) {
+::view-transition-old(slide-down) {
     animation: 150ms ease-out both fade-out, 150ms ease-out both slide-down;
 }
 
-::view-transition-new(.slide-up) {
+::view-transition-new(slide-up) {
     animation: 210ms ease-in 150ms both fade-in, 400ms ease-in both slide-up;
 }
 
 /* Animations for view transition classed added by transition type */
-::view-transition-old(.slide-forward) {
+::view-transition-old(nav-forward) {
     /* when sliding forward, the "old" page should slide out to left. */
     animation: 150ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
     400ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
 }
 
-::view-transition-new(.slide-forward) {
+::view-transition-new(nav-forward) {
     /* when sliding forward, the "new" page should slide in from right. */
     animation: 210ms cubic-bezier(0, 0, 0.2, 1) 150ms both fade-in,
     400ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
 }
 
-::view-transition-old(.slide-back) {
+::view-transition-old(nav-back) {
     /* when sliding back, the "old" page should slide out to right. */
     animation: 150ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
     400ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-right;
 }
 
-::view-transition-new(.slide-back) {
+::view-transition-new(nav-back) {
     /* when sliding back, the "new" page should slide in from left. */
     animation: 210ms cubic-bezier(0, 0, 0.2, 1) 150ms both fade-in,
     400ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-left;

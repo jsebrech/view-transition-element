@@ -1,8 +1,18 @@
-import { interceptNavigation } from '../lib/view-route.js';
-import '../lib/view-transition.js';
+import { interceptNavigation, routerEvents, pushState } from '../lib/view-route.js';
+import { startTransition } from '../lib/view-transition.js';
 import './app.js';
 
 const app = () => {
+    // intercept default router behavior to make it animate view transitions
+    routerEvents.addEventListener('navigate', (e) => {
+        e.stopImmediatePropagation();
+        const { url, a } = e.detail;
+        const isBackNav = a?.hasAttribute('back');
+        startTransition(() => {
+            pushState(null, null, url);
+        }, isBackNav ? 'nav-back' : 'nav-forward');
+    }, { capture: true });
+
     const root = document.getElementById('root');
     root.innerHTML = `<demo-app></demo-app>`;
     interceptNavigation(root);

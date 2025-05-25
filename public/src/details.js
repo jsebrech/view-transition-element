@@ -1,4 +1,5 @@
 import './layout.js';
+import { startTransition } from '../lib/view-transition.js';
 import { ChevronLeft, PlayIcon, PauseIcon } from './icons.js';
 import { fetchVideo, fetchVideoDetails } from './data.js';
 
@@ -7,9 +8,11 @@ customElements.define('demo-details', class extends HTMLElement {
         this.innerHTML = `
             <view-route path="/video/(?<id>[\\w]+)">
                 <demo-page>
-                    <a class="link fit back" href="/" slot="heading">
-                        ${ChevronLeft()} Back
-                    </a>
+                    <div slot="heading">
+                        <a class="link fit back" href="/" back>
+                            ${ChevronLeft()} Back
+                        </a>
+                    </div>
                     <div class="details">
                         <demo-video></demo-video>
                         <demo-video-details></demo-video-details>
@@ -28,17 +31,20 @@ customElements.define('demo-details', class extends HTMLElement {
     }
 
     update(id) {
+        console.log('details update', id);
         const videoElem = this.querySelector('demo-video');
         if (id) {
-            fetchVideo(id).then(video => {
+            startTransition(() => fetchVideo(id).then(video => {
                 videoElem.innerHTML = `
-                    <div
-                        aria-hidden="true"
-                        class="thumbnail ${video.image}">
-                        <demo-video-controls></demo-video-controls>
-                    </div>
+                    <view-transition name="video-${video.id}">
+                        <div
+                            aria-hidden="true"
+                            class="thumbnail ${video.image}">
+                            <demo-video-controls></demo-video-controls>
+                        </div>
+                    </view-transition>
                 `;
-            });
+            }));
             this.querySelector('demo-video-details').update(id);
         } else {
             videoElem.innerHTML = '';
@@ -47,12 +53,26 @@ customElements.define('demo-details', class extends HTMLElement {
 });
 
 customElements.define('demo-video-details', class extends HTMLElement {
-    update(id) {
+    async update(id) {
         if (id) {
-            this.innerHTML = videoInfoFallback();
-            fetchVideoDetails(id).then(video => {
+            const load = fetchVideoDetails(id);
+            const wait = new Promise((resolve) => { setTimeout(resolve, 10, null); });
+            let video = await Promise.race([load, wait]);
+            if (video) {
                 this.innerHTML = videoInfo(video);
-            });
+            } else {
+                this.innerHTML = `<view-transition>${videoInfoFallback()}</view-transition>`;
+                video = await load;
+                // animate fallback out by sliding down
+                this.querySelector('view-transition').name = 'slide-down';
+                // animate content in by sliding up
+                startTransition(() => {
+                    this.innerHTML = 
+                        `<view-transition name="slide-up">${videoInfo(video)}</view-transition>`;
+                }).finished.then(() => {
+                    this.querySelector('view-transition').name = '';
+                });
+            }
         } else this.innerHTML = '';
     }
 });
@@ -69,8 +89,10 @@ customElements.define('demo-video-controls', class extends HTMLElement {
         this.update();
     }
     handleEvent(e) {
-        this.isPlaying = !this.isPlaying;
-        this.update();
+        startTransition(async () => {
+            this.isPlaying = !this.isPlaying;
+            this.update();
+        });
     }
     update() {
         this.querySelector('span').innerHTML = this.isPlaying ? PauseIcon() : PlayIcon();

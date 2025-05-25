@@ -614,6 +614,8 @@ ul {
   height: 100%;
 }
 
+/* extra styles: */
+
 .link {
   /* make it work on proper links */
   text-decoration: none;

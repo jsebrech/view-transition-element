@@ -63,6 +63,7 @@ customElements.define('view-route', class extends HTMLElement {
         const exact = this.hasAttribute('exact');
         this.setMatches(this.matchesRoute(path, exact) || []);
         if (this.isActive) {
+            console.log('dispatch routechange', this.getAttribute('path'), this.matches);
             this.dispatchEvent(new CustomEvent('routechange', { detail: this.matches, bubbles: true }));
         }
     }
@@ -90,37 +91,41 @@ customElements.define('view-route', class extends HTMLElement {
     }
 });
 
-export const pushState = (state, unused, url) => {
-    history.pushState(state, unused, url);
-    routerEvents.dispatchEvent(new CustomEvent('pushstate', { detail: { state, url } }));
-    routerEvents.dispatchEvent(new PopStateEvent('popstate', { state }));
-}
-
 const handleLinkClick = (e) => {
     const a = e.target.closest('a');
     if (a && a.href) {
         e.preventDefault();
         const anchorUrl = new URL(a.href);
         const pageUrl = basePath + anchorUrl.pathname + anchorUrl.search + anchorUrl.hash;
-        pushState(null, null, pageUrl);
+        routerEvents.dispatchEvent(new CustomEvent('navigate', { detail: { url: pageUrl, a }}));
     }
 }
 
-/**
- * Automatically change link behavior so it does single-page navigation with pushState instead of multi-page
- * @param {Array} links Elements that dispatch a 'click' event and contain a 'href' attribute
- */
-export const decorateLinks = (links) => {
-    for (const link of links) {
-        link.addEventListener('click', handleLinkClick);
-    }
+const handleNavigate = (e) => {
+    pushState(null, null, e.detail.url);
 }
 
 /** 
  * intercept link navigation for all links inside root, 
- * and do single-page navigation using pushState instead 
+ * and do single-page navigation using pushState instead.
  * @param {HTMLElement} root
  */
 export const interceptNavigation = (root) => {
     root.addEventListener('click', handleLinkClick);
+    // by default, navigate events cause pushState() calls
+    // add capturing listener to routerEvents before interceptNavigation() to prevent
+    routerEvents.addEventListener('navigate', handleNavigate);
+}
+
+/**
+ * Navigate to a new state and update routes
+ * @param {*} state 
+ * @param {*} unused 
+ * @param {*} url 
+ */
+export const pushState = (state, unused, url) => {
+    console.log('pushState', url);
+    history.pushState(state, unused, url);
+    routerEvents.dispatchEvent(new CustomEvent('pushstate', { detail: { state, url } }));
+    routerEvents.dispatchEvent(new PopStateEvent('popstate', { state }));
 }
