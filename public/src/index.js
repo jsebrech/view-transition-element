@@ -8,9 +8,13 @@ const app = () => {
         e.stopImmediatePropagation();
         const { url, a } = e.detail;
         const isBackNav = a?.hasAttribute('back');
-        startTransition(() => {
-            pushState(null, null, url);
-        }, isBackNav ? 'nav-back' : 'nav-forward');
+        startTransition(
+            () => {
+                pushState(null, null, url);
+                // give routes time to render before snapshotting
+                return new Promise(resolve => setTimeout(resolve, 10));
+            }, 
+            isBackNav ? 'nav-back' : 'nav-forward');
     }, { capture: true });
 
     const root = document.getElementById('root');

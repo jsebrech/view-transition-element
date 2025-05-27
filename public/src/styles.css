@@ -616,8 +616,8 @@ ul {
 
 /* extra styles: */
 
+/* make this class work for actual <a> elements */
 .link {
-  /* make it work on proper links */
   text-decoration: none;
   color: inherit;
 }

@@ -36,7 +36,6 @@ customElements.define('view-transition', class extends HTMLElement {
                 `${localName}::part(${this.getAttribute('part')}) { 
                     view-transition-name: ${this.style.viewTransitionName};
                 }`);
-            console.log(this, stylesheet);
         }
     }
 });
@@ -61,10 +60,10 @@ let nextTransition = null;
 
 /** start a view transition or queue it for later if one is already animating */
 export const startTransition = (updateCallback, transitionType) => {
-    console.log('startTransition');
+    log('startTransition', { updateCallback, transitionType });
     if (!updateCallback) updateCallback = () => {};
     // a transition is active
-    if (currentTransition) {
+    if (currentTransition && !currentTransition.isFinished) {
         // it is running callbacks, but not yet animating
         if (!currentTransition.isReady) {
             currentTransition.addCallback(updateCallback);
@@ -138,14 +137,22 @@ class QueueingViewTransition {
     isFinished = false;
 
     constructor(transitionType) {
-        console.log('new transition', this.id);
+        log('new QueueingViewTransition', { id: this.id, obj: this });
         this.#transitionType = transitionType;
         this.ready.finally(() => this.isReady = true);
-        this.finished.finally(() => (this.isFinished = true) && console.log('finished transition', this.id));
+        this.finished.finally(() => {
+            this.isFinished = true;
+            log('QVT.finished', { 
+                id: this.id, obj: this,
+                names: [...document.querySelectorAll('view-transition')]
+                    .filter(v => v.checkVisibility())
+                    .map(v => v.style.viewTransitionName)
+            });
+        });
     }
 
     addCallback(updateCallback) {
-        console.log('add callback', this.id, updateCallback);
+        log('QVT.addCallback', { id: this.id, updateCallback, obj: this });
         if (typeof updateCallback !== 'function') throw new Error('updateCallback must be a function');
         if (this.isReady) throw new Error('view transition already started');
         this.#callbacks.push(updateCallback);
@@ -153,7 +160,7 @@ class QueueingViewTransition {
     }
 
     run(skipTransition = false) {
-        console.log('run transition', this.id);
+        log('QVT.run', { id: this.id, obj: this });
         // already running
         if (this.isRunning) return;
         this.isRunning = true;
@@ -163,7 +170,8 @@ class QueueingViewTransition {
         const doNext = () => {
             if (this.#callbacks.length) {
                 const callback = this.#callbacks.shift();
-                return Promise.try(callback).then(doNext);
+                log('QVT.run > callback', { id: this.id, obj: this, callback });
+                return promiseTry(callback).then(doNext);
             }
         };
 
@@ -178,7 +186,12 @@ class QueueingViewTransition {
                 .then(this.#finished.resolve, this.#finished.reject);
         // start animating
         } else {
-            console.log('start view transition', this.id, [...document.querySelectorAll('view-transition')].map(v => [v, v.style.viewTransitionName]));
+            log('QVT.run > document.startViewTransition', 
+                { id: this.id, obj: this, callbacks: this.#callbacks.slice(), 
+                  names: [...document.querySelectorAll('view-transition')]
+                    .filter(v => v.checkVisibility())
+                    .map(v => v.style.viewTransitionName)
+            });
             this.#activeViewTransition = doViewTransition(callback, this.#transitionType);
             this.#activeViewTransition.ready.then(this.#ready.resolve, this.#ready.reject);
             this.#activeViewTransition.finished.then(this.#finished.resolve, this.#finished.reject);
@@ -199,4 +212,16 @@ class QueueingViewTransition {
             this.run(true);
         }
     }
+}
+
+// polyfill
+function promiseTry(fn) {
+    if (Promise.try) return Promise.try(fn);
+	return new Promise(function(resolve) {
+		resolve(fn());
+	});
+}
+
+function log(...args) {
+    console.log(...args);
 }

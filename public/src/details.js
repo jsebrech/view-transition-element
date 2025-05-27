@@ -61,7 +61,8 @@ customElements.define('demo-video-details', class extends HTMLElement {
             if (video) {
                 this.innerHTML = videoInfo(video);
             } else {
-                this.innerHTML = `<view-transition>${videoInfoFallback()}</view-transition>`;
+                // animate fallback in by sliding up
+                this.innerHTML = `<view-transition name="slide-up">${videoInfoFallback()}</view-transition>`;
                 video = await load;
                 // animate fallback out by sliding down
                 this.querySelector('view-transition').name = 'slide-down';
