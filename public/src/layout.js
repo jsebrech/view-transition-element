@@ -22,7 +22,7 @@ customElements.define('demo-page', class extends HTMLElement {
         const viewTransition = this.shadowRoot.querySelector('view-transition');
         transitionEvents.addEventListener('transitionstart', e => {
             const transitionType = e.detail?.transitionType;
-            switch (e.detail?.transitionType) {
+            switch (transitionType) {
                 case 'nav-back':
                 case 'nav-forward':
                     viewTransition.name = transitionType;

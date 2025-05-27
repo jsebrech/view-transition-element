@@ -1,6 +1,6 @@
 import { interceptNavigation, routerEvents, pushState } from '../lib/view-route.js';
 import { startTransition } from '../lib/view-transition.js';
-import './app.js';
+import './App.js';
 
 const app = () => {
     // intercept default router behavior to make it animate view transitions

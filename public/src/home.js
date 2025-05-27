@@ -1,8 +1,8 @@
-import './layout.js';
-import './videos.js';
-import { IconSearch } from "./icons.js";
-import { fetchVideos } from "./data.js";
 import { routerEvents } from "../lib/view-route.js";
+import './Layout.js';
+import './Videos.js';
+import { IconSearch } from "./Icons.js";
+import { fetchVideos } from "./data.js";
 
 customElements.define('demo-home', class extends HTMLElement {
     videos = [];

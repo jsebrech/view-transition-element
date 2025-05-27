@@ -1,5 +1,5 @@
-import './home.js';
-import './details.js';
+import './Home.js';
+import './Details.js';
 
 customElements.define('demo-app', class extends HTMLElement {
     connectedCallback() {

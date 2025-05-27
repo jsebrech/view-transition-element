@@ -1,4 +1,6 @@
-import './like-button.js';
+import { startTransition } from '../lib/view-transition.js';
+import { PlayIcon, PauseIcon } from './Icons.js';
+import './LikeButton.js';
 
 customElements.define('demo-video', class extends HTMLElement {
     update(video) {
@@ -21,5 +23,27 @@ customElements.define('demo-video', class extends HTMLElement {
                 <demo-video-like id="${video.id}"></demo-video-like>
             </div>
         `;
+    }
+});
+
+customElements.define('demo-video-controls', class extends HTMLElement {
+    isPlaying = false;
+    connectedCallback() {
+        this.innerHTML = `
+            <span class="controls">
+                ${PlayIcon()}
+            </span>
+        `;
+        this.addEventListener('click', this);
+        this.update();
+    }
+    handleEvent(e) {
+        startTransition(async () => {
+            this.isPlaying = !this.isPlaying;
+            this.update();
+        });
+    }
+    update() {
+        this.querySelector('span').innerHTML = this.isPlaying ? PauseIcon() : PlayIcon();
     }
 });

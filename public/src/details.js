@@ -1,6 +1,6 @@
-import './layout.js';
+import './Layout.js';
 import { startTransition } from '../lib/view-transition.js';
-import { ChevronLeft, PlayIcon, PauseIcon } from './icons.js';
+import { ChevronLeft } from './Icons.js';
 import { fetchVideo, fetchVideoDetails } from './data.js';
 
 customElements.define('demo-details', class extends HTMLElement {
@@ -31,7 +31,6 @@ customElements.define('demo-details', class extends HTMLElement {
     }
 
     update(id) {
-        console.log('details update', id);
         const videoElem = this.querySelector('demo-video');
         if (id) {
             startTransition(() => fetchVideo(id).then(video => {
@@ -77,28 +76,6 @@ customElements.define('demo-video-details', class extends HTMLElement {
         } else this.innerHTML = '';
     }
 });
-
-customElements.define('demo-video-controls', class extends HTMLElement {
-    isPlaying = false;
-    connectedCallback() {
-        this.innerHTML = `
-            <span class="controls">
-                ${PlayIcon()}
-            </span>
-        `;
-        this.addEventListener('click', this);
-        this.update();
-    }
-    handleEvent(e) {
-        startTransition(async () => {
-            this.isPlaying = !this.isPlaying;
-            this.update();
-        });
-    }
-    update() {
-        this.querySelector('span').innerHTML = this.isPlaying ? PauseIcon() : PlayIcon();
-    }
-})
 
 const videoInfoFallback = () => `
     <div class="fallback title"></div>

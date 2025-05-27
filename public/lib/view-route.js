@@ -32,16 +32,12 @@ customElements.define('view-route', class extends HTMLElement {
 
     connectedCallback() {
         this.style.display = 'contents';
-        window.addEventListener('hashchange', this);
-        window.addEventListener('popstate', this);
-        routerEvents.addEventListener('pushstate', this);
+        routerEvents.addEventListener('popstate', this);
         this.update();
     }
 
     disconnectedCallback() {
-        window.removeEventListener('hashchange', this);
-        window.removeEventListener('popstate', this);
-        routerEvents.removeEventListener('pushstate', this);
+        routerEvents.removeEventListener('popstate', this);
     }
 
     handleEvent(e) {
@@ -63,7 +59,6 @@ customElements.define('view-route', class extends HTMLElement {
         const exact = this.hasAttribute('exact');
         this.setMatches(this.matchesRoute(path, exact) || []);
         if (this.isActive) {
-            console.log('dispatch routechange', this.getAttribute('path'), this.matches);
             this.dispatchEvent(new CustomEvent('routechange', { detail: this.matches, bubbles: true }));
         }
     }
@@ -124,7 +119,6 @@ export const interceptNavigation = (root) => {
  * @param {*} url 
  */
 export const pushState = (state, unused, url) => {
-    console.log('pushState', url);
     history.pushState(state, unused, url);
     routerEvents.dispatchEvent(new CustomEvent('pushstate', { detail: { state, url } }));
     routerEvents.dispatchEvent(new PopStateEvent('popstate', { state }));

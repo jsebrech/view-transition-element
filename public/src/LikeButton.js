@@ -1,4 +1,4 @@
-import { Heart } from './icons.js';
+import { Heart } from './Icons.js';
 
 // A hack since we don't actually have a backend.
 // Unlike local state, this survives videos being filtered.

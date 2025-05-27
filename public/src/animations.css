@@ -1,20 +1,3 @@
-/* No additional animations needed */
-
-
-
-
-
-
-
-
-
-/* Previously defined animations below */
-
-
-
-
-
-
 /* Slide animations for Suspense the fallback down */
 ::view-transition-old(slide-down) {
     animation: 150ms ease-out both fade-out, 150ms ease-out both slide-down;
@@ -108,13 +91,4 @@
     to {
         transform: translateX(0);
     }
-}
-
-/* Default .slow-fade. */
-::view-transition-old(.slow-fade) {
-    animation-duration: 500ms;
-}
-
-::view-transition-new(.slow-fade) {
-    animation-duration: 500ms;
 }

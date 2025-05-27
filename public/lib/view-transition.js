@@ -1,22 +1,24 @@
-let nextId = 0;
+let nextVTId = 0;
 
 customElements.define('view-transition', class extends HTMLElement {
-    #defaultName = 'VT_' + nextId++;
+    #defaultName = 'VT_' + nextVTId++;
 
     get name() { return this.getAttribute('name') }
     set name(v) { this.setAttribute('name', v); }
 
     static get observedAttributes() { return ['name'] }
-    attributeChangedCallback() {
-        this.update();
-    }
+    attributeChangedCallback() { this.update(); }
 
-    connectedCallback() {
-        this.update();
-    }
+    connectedCallback() { this.update(); }
+
+    disconnectedCallback() { this.updateShadowRule(false); }
 
     update() {
         this.style.viewTransitionName = this.name || this.#defaultName;
+        this.updateShadowRule();
+    }
+
+    updateShadowRule(insert = true) {
         // if this is inside a shadow dom, make it visible to light dom view transitions
         // by setting view-transition-name on a shadow part from a light dom stylesheet
         if (this.getRootNode() instanceof ShadowRoot) {
@@ -25,17 +27,21 @@ customElements.define('view-transition', class extends HTMLElement {
             }
             const stylesheet = getTransitionStyleSheet();
             const localName = this.getRootNode().host.localName;
+
             // delete the old rule
             const oldIndex = [...stylesheet.cssRules].findIndex(r => {
                 const match = /^([^:]+)::part\(([^)]+)\)/.exec(r.selectorText);
                 if (match && match[1] === localName && match[2] === this.getAttribute('part')) return true;
             });
             if (oldIndex >= 0) stylesheet.deleteRule(oldIndex);
+                
             // add the new rule
-            stylesheet.insertRule(
-                `${localName}::part(${this.getAttribute('part')}) { 
-                    view-transition-name: ${this.style.viewTransitionName};
-                }`);
+            if (insert) {
+                stylesheet.insertRule(
+                    `${localName}::part(${this.getAttribute('part')}) { 
+                        view-transition-name: ${this.style.viewTransitionName};
+                    }`);
+            }
         }
     }
 });
@@ -223,5 +229,5 @@ function promiseTry(fn) {
 }
 
 function log(...args) {
-    console.log(...args);
+    console.debug(...args);
 }
