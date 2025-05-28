@@ -4,8 +4,8 @@ window.addEventListener('popstate', (e) => {
     routerEvents.dispatchEvent(new PopStateEvent('popstate', { state: e.state }));
 });
 
-const baseURL = new URL(document.URL);
-const basePath = baseURL.pathname.includes('/public') ? '/public' : '';
+const baseURL = new URL(window.originalHref || document.URL);
+const basePath = baseURL.pathname.slice(0, baseURL.pathname.lastIndexOf('/'));
 
 /**
  * Usage:
