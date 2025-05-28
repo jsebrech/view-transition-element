@@ -1,5 +1,5 @@
 {
-  "redirects": [
-    { "source": "video/**", "destination": "index.html" }
+  "rewrites": [
+    { "source": "video/**", "destination": "404.html" }
   ]
 }

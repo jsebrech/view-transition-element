@@ -20,6 +20,8 @@ Part of the [Plain Vanilla Web](https://plainvanillaweb.com) project.
 
 A routing custom element that wraps content that is conditional on the current route.
 
+`lib/view-route.js`
+
 ```html
 <!-- Basic routing -->
 <view-route path="/home">Home content</view-route>
@@ -53,6 +55,8 @@ document.querySelector('view-route').addEventListener('routechange', e => {
 ### view-transition
 
 A declarative view transition custom element that marks its contents as taking part as a separate entity in a view transition.
+
+`lib/view-transition.js`
 
 ```html
 <!-- Named transitions for shared elements -->
@@ -90,4 +94,5 @@ To combine `startTransition` view transitions with `pushState` single-page routi
 
 Run the example single-page application with `npx serve public`
 
-Redirecting the `/video/...` routes to `index.html` is handled by `serve.json` when running through `npx serve`, and by `404.html` when deployed on GitHub Pages. When deploying elsewhere a different redirect mechanism should be configured.
+Redirecting the `/video/...` routes to `index.html` is handled by `serve.json` when running through `npx serve`, 
+and by `404.html` when deployed on GitHub Pages. When deploying elsewhere a different redirect mechanism should be configured.

@@ -20,7 +20,8 @@ customElements.define('demo-details', class extends HTMLElement {
                 </demo-page>
             </view-route>
         `;
-        this.id = null;
+        const id = this.querySelector('view-route').matches?.groups?.id ?? null;
+        this.update(id);
         this.addEventListener('routechange', this);
     }
     
@@ -32,6 +33,7 @@ customElements.define('demo-details', class extends HTMLElement {
 
     update(id) {
         const videoElem = this.querySelector('demo-video');
+        videoElem.innerHTML = '';
         if (id) {
             startTransition(() => fetchVideo(id).then(video => {
                 videoElem.innerHTML = `
@@ -45,8 +47,6 @@ customElements.define('demo-details', class extends HTMLElement {
                 `;
             }));
             this.querySelector('demo-video-details').update(id);
-        } else {
-            videoElem.innerHTML = '';
         }
     }
 });

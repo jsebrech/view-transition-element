@@ -5,7 +5,7 @@ window.addEventListener('popstate', (e) => {
 });
 
 const baseURL = new URL(document.URL);
-const basePath = baseURL.pathname.slice(0, baseURL.pathname.lastIndexOf('/'));
+const basePath = baseURL.pathname.includes('/public') ? '/public' : '';
 
 /**
  * Usage:
@@ -120,6 +120,5 @@ export const interceptNavigation = (root) => {
  */
 export const pushState = (state, unused, url) => {
     history.pushState(state, unused, url);
-    routerEvents.dispatchEvent(new CustomEvent('pushstate', { detail: { state, url } }));
     routerEvents.dispatchEvent(new PopStateEvent('popstate', { state }));
 }
