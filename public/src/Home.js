@@ -1,4 +1,5 @@
 import { routerEvents } from "../lib/view-route.js";
+import { startTransition } from "../lib/view-transition.js";
 import './Layout.js';
 import './Videos.js';
 import { IconSearch } from "./Icons.js";
@@ -73,20 +74,25 @@ customElements.define('demo-search-input', class extends HTMLElement {
 customElements.define('demo-search-list', class extends HTMLElement {
     update(videos, text) {
         const filteredVideos = filterVideos(videos, text);
-        this.innerHTML = `
-            <div class="video-list">
-                <div class="videos"></div>
-                ${!filteredVideos.length ? (
-                    `<div class="no-results">No results</div>`
-                ) : ''}
-            </div>
-        `;
-        const videosEl = this.querySelector('.videos');
-        videosEl.replaceChildren(...filteredVideos.map(v => {
-            const video = document.createElement('demo-video');
-            video.update(v);
-            return video;
-        }));
+        startTransition(() => {
+            this.innerHTML = `
+                <div class="video-list">
+                    <div class="videos"></div>
+                    ${!filteredVideos.length ? (
+                        `<div class="no-results">No results</div>`
+                    ) : ''}
+                </div>
+            `;
+            if (filteredVideos.length) {
+                this.querySelector('.videos').replaceChildren(...filteredVideos.map(v => {
+                    const transition = document.createElement('view-transition');
+                    transition.name = `list-video-${v.id}`;
+                    transition.append(document.createElement('demo-video'));
+                    transition.firstChild.update(v);
+                    return transition;
+                }));
+            }
+        });
     }
 });
 
