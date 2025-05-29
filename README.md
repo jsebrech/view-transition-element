@@ -14,7 +14,7 @@ This repo can also be used as a template for a vanilla single-page application.
 
 Works in Chrome, Edge, Safari, Firefox (no transitions).
 
-View transition support for Firefox is plannedon their roadmap: https://bugzilla.mozilla.org/show_bug.cgi?id=1823896
+View transition support for Firefox is planned on their roadmap: https://bugzilla.mozilla.org/show_bug.cgi?id=1823896
 
 Part of the [Plain Vanilla Web](https://plainvanillaweb.com) project.
 
