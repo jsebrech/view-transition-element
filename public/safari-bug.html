@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Safari view transition bug reduced testcase</title>
+</head>
+
+<body>
+    <div id="root"></div>
+    
+    <script>
+        customElements.define('view-transition', class extends HTMLElement {
+            connectedCallback() { 
+                this.style.viewTransitionName = 'test';
+            }
+        });
+
+        customElements.define('demo-error', class extends HTMLElement {
+            connectedCallback() {
+                document.startViewTransition(() => {
+                    // safari: produces error InvalidStateError: Multiple elements found with view-transition-name: test
+                    // changing div into span makes the error go away, as does removing the div
+                    this.innerHTML = `
+                        <view-transition>
+                            <div>
+                                demo (check console)
+                            </div>
+                        </view-transition>
+                    `;
+                });
+            }
+        });
+
+        const root = document.getElementById('root');
+        root.innerHTML = `<demo-error></demo-error>`;
+    </script>
+</body>
+
+</html>
