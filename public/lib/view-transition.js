@@ -14,6 +14,7 @@ customElements.define('view-transition', class extends HTMLElement {
     disconnectedCallback() { this.updateShadowRule(false); }
 
     update() {
+        this.style.display = 'block';
         this.style.viewTransitionName = this.name || this.#defaultName;
         this.updateShadowRule();
     }

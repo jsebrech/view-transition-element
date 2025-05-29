@@ -14,11 +14,9 @@ This repo can also be used as a template for a vanilla single-page application.
 
 Part of the [Plain Vanilla Web](https://plainvanillaweb.com) project.
 
-Works in Chrome, Edge.
+Works in Chrome, Edge, Safari.
 
-Does not work in:
-- Firefox: planned, see https://bugzilla.mozilla.org/show_bug.cgi?id=1823896
-- Safari: seems like a bug in Safari itself, see `public/safari-bug.html` for a reduced testcase
+Does not work in Firefox. They are planning support, see https://bugzilla.mozilla.org/show_bug.cgi?id=1823896
 
 ## Using
 
