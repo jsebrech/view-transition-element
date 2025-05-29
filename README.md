@@ -12,13 +12,15 @@ https://codesandbox.io/p/sandbox/njn4yc
 
 This repo can also be used as a template for a vanilla single-page application.
 
+Works in Chrome, Edge, Safari, Firefox (no transitions).
+
+View transition support for Firefox is plannedon their roadmap: https://bugzilla.mozilla.org/show_bug.cgi?id=1823896
+
 Part of the [Plain Vanilla Web](https://plainvanillaweb.com) project.
 
-Works in Chrome, Edge, Safari.
-
-Does not work in Firefox. They are planning support, see https://bugzilla.mozilla.org/show_bug.cgi?id=1823896
-
 ## Using
+
+Drop the web components from the `lib/` folder into a vanilla project and load them into the document to start using.
 
 ### view-route
 
