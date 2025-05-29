@@ -1,8 +1,10 @@
 export const routerEvents = new EventTarget();
 
-window.addEventListener('popstate', (e) => {
+// update routes on popstate (browser back/forward)
+export const handlePopState = (e) => {
     routerEvents.dispatchEvent(new PopStateEvent('popstate', { state: e.state }));
-});
+}
+window.addEventListener('popstate', handlePopState);
 
 const baseURL = new URL(window.originalHref || document.URL);
 const basePath = baseURL.pathname.slice(0, baseURL.pathname.lastIndexOf('/'));

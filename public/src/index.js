@@ -1,4 +1,4 @@
-import { interceptNavigation, routerEvents, pushState } from '../lib/view-route.js';
+import { interceptNavigation, routerEvents, handlePopState, pushState } from '../lib/view-route.js';
 import { startTransition } from '../lib/view-transition.js';
 import './App.js';
 
@@ -8,14 +8,20 @@ const app = () => {
         e.stopImmediatePropagation();
         const { url, a } = e.detail;
         const isBackNav = a?.hasAttribute('back');
+        const transitionType = isBackNav ? 'nav-back' : 'nav-forward';
         startTransition(
             () => {
-                pushState(null, null, url);
+                pushState(transitionType, null, url);
                 // give routes time to render before snapshotting
                 return new Promise(resolve => setTimeout(resolve, 10));
             }, 
-            isBackNav ? 'nav-back' : 'nav-forward');
+            transitionType);
     }, { capture: true });
+    // intercept popstate to animate back/forward page navigation
+    window.removeEventListener('popstate', handlePopState);
+    window.addEventListener('popstate', (e) => {
+        startTransition(() => handlePopState(e), e.state);
+    });
 
     const root = document.getElementById('root');
     root.innerHTML = `<demo-app></demo-app>`;
