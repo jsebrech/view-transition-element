@@ -60,17 +60,12 @@ customElements.define('demo-video-details', class extends HTMLElement {
             if (video) {
                 this.innerHTML = videoInfo(video);
             } else {
-                // animate fallback in by sliding up
-                this.innerHTML = `<view-transition name="slide-up">${videoInfoFallback()}</view-transition>`;
+                this.innerHTML = `<view-transition name="details-fallback">${videoInfoFallback()}</view-transition>`;
                 video = await load;
-                // animate fallback out by sliding down
-                this.querySelector('view-transition').name = 'slide-down';
-                // animate content in by sliding up
+                // animate content in and fallback out
                 startTransition(() => {
                     this.innerHTML = 
-                        `<view-transition name="slide-up">${videoInfo(video)}</view-transition>`;
-                }).finished.then(() => {
-                    this.querySelector('view-transition').name = '';
+                        `<view-transition name="details-content">${videoInfo(video)}</view-transition>`;
                 });
             }
         } else this.innerHTML = '';
