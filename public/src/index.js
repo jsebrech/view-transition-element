@@ -7,7 +7,7 @@ const app = () => {
     routerEvents.addEventListener('navigate', (e) => {
         e.stopImmediatePropagation();
         const { url, a } = e.detail;
-        const isBackNav = a?.hasAttribute('back');
+        const isBackNav = a?.classList?.contains('back');
         const transitionType = isBackNav ? 'nav-back' : 'nav-forward';
         startTransition(
             () => {

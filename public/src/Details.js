@@ -9,7 +9,7 @@ customElements.define('demo-details', class extends HTMLElement {
             <view-route path="/video/(?<id>[\\w]+)">
                 <demo-page>
                     <div slot="heading">
-                        <a class="link fit back" href="/" back>
+                        <a class="link fit back" href="/">
                             ${ChevronLeft()} Back
                         </a>
                     </div>

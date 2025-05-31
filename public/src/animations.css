@@ -1,3 +1,4 @@
+/* Slide animations for details content */
 ::view-transition-old(details-fallback):only-child {
     animation: 150ms ease-out both fade-out, 150ms ease-out both slide-down;
 }
