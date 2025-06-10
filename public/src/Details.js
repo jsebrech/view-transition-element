@@ -1,7 +1,8 @@
-import './Layout.js';
 import { startTransition } from '../lib/view-transition.js';
+import { html } from '../lib/html.js';
 import { ChevronLeft } from './Icons.js';
 import { fetchVideo, fetchVideoDetails } from './data.js';
+import './Layout.js';
 
 customElements.define('demo-details', class extends HTMLElement {
     connectedCallback() {
@@ -36,14 +37,13 @@ customElements.define('demo-details', class extends HTMLElement {
         videoElem.innerHTML = '';
         if (id) {
             startTransition(() => fetchVideo(id).then(video => {
-                videoElem.innerHTML = `
-                    <view-transition name="video-${video.id}">
-                        <div
-                            aria-hidden="true"
-                            class="thumbnail ${video.image}">
-                            <demo-video-controls></demo-video-controls>
-                        </div>
-                    </view-transition>
+                videoElem.innerHTML = html`
+                    <div
+                        aria-hidden="true"
+                        style="view-transition-name: video-${video.id}"
+                        class="thumbnail ${video.image}">
+                        <demo-video-controls></demo-video-controls>
+                    </div>
                 `;
             }));
             this.querySelector('demo-video-details').update(id);
@@ -60,12 +60,11 @@ customElements.define('demo-video-details', class extends HTMLElement {
             if (video) {
                 this.innerHTML = videoInfo(video);
             } else {
-                this.innerHTML = `<view-transition name="details-fallback">${videoInfoFallback()}</view-transition>`;
+                this.innerHTML = videoInfoFallback();
                 video = await load;
                 // animate content in and fallback out
                 startTransition(() => {
-                    this.innerHTML = 
-                        `<view-transition name="details-content">${videoInfo(video)}</view-transition>`;
+                    this.innerHTML = videoInfo(video);
                 });
             }
         } else this.innerHTML = '';
@@ -73,11 +72,15 @@ customElements.define('demo-video-details', class extends HTMLElement {
 });
 
 const videoInfoFallback = () => `
-    <div class="fallback title"></div>
-    <div class="fallback description"></div>
+    <div style="view-transition-name: details-fallback">
+        <div class="fallback title"></div>
+        <div class="fallback description"></div>
+    </div>
 `;
 
-const videoInfo = (details) => `
-    <p class="info-title">${details.title}</p>
-    <p class="info-description">${details.description}</p>
+const videoInfo = (details) => html`
+    <div style="view-transition-name: details-content">
+        <p class="info-title">${details.title}</p>
+        <p class="info-description">${details.description}</p>
+    </div>
 `;

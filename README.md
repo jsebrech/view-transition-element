@@ -60,7 +60,10 @@ document.querySelector('view-route').addEventListener('routechange', e => {
 
 ### view-transition
 
-A declarative view transition custom element that marks its contents as taking part as a separate entity in a view transition.
+A declarative view transition custom element that marks its contents as taking part as a separate entity in a view transition. It also automatically makes itself
+visible to light DOM view transitions when it is in a shadow DOM.
+
+When possible it is recommended to set `view-transition-name` styles directly instead of using this custom element. This example demonstrates both approaches.
 
 `lib/view-transition.js`
 
@@ -95,6 +98,10 @@ startTransition(() => {
 ```
 
 To combine `startTransition` view transitions with `pushState` single-page routing see `index.js`.
+
+### html
+
+HTML-encoding in template literals is done using [html-literal](https://github.com/jsebrech/html-literal), which is bundled in this repo.
 
 ## Example
 

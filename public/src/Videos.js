@@ -7,13 +7,12 @@ customElements.define('demo-video', class extends HTMLElement {
         this.innerHTML = `
             <div class="video">
                 <a class="link" href="/video/${video.id}">
-                    <view-transition name="video-${video.id}">
-                        <div
-                            aria-hidden="true"
-                            tabIndex={-1}
-                            class="thumbnail ${video.image}">
-                        </div>
-                    </view-transition>
+                    <div
+                        aria-hidden="true"
+                        tabIndex="-1"
+                        style="view-transition-name: video-${video.id}"
+                        class="thumbnail ${video.image}">
+                    </div>
 
                     <div class="info">
                         <div class="video-title">${video.title}</div>
