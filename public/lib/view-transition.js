@@ -110,10 +110,11 @@ const doViewTransition = (updateCallback, transitionType) => {
         transition = document.startViewTransition(updateCallback);
     } else {
         // fake view transition in firefox
+        const done = promiseTry(updateCallback);
         transition = {
-            updateCallbackDone: updateCallback(),
-            ready: Promise.resolve(),
-            finished: Promise.resolve(),
+            updateCallbackDone: done,
+            ready: done,
+            finished: done,
             skipTransition: () => {}
         };
     }
