@@ -58,6 +58,8 @@ document.querySelector('view-route').addEventListener('routechange', e => {
 });
 ```
 
+See [jsebrech/view-route](https://github.com/jsebrech/view-route) for more info.
+
 ### view-transition
 
 A declarative view transition custom element that marks its contents as taking part as a separate entity in a view transition. It also automatically makes itself

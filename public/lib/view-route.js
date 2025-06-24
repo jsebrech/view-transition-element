@@ -1,92 +1,7 @@
 export const routerEvents = new EventTarget();
 
-// update routes on popstate (browser back/forward)
-export const handlePopState = (e) => {
-    routerEvents.dispatchEvent(new PopStateEvent('popstate', { state: e.state }));
-}
-window.addEventListener('popstate', handlePopState);
-
 const baseURL = new URL(window.originalHref || document.URL);
 const basePath = baseURL.pathname.slice(0, baseURL.pathname.lastIndexOf('/'));
-
-/**
- * Usage:
- * <view-route path="/(?:index.html)?" exact><p>hello</p><view-route> = only match / or /index.html and show the text "hello"
- * <view-route path="/"> = match every route below / (e.g. for site navigation)
- * <view-route path="/todos/([\w]+)"> = match #/todos/:id
- * <view-route path="*"> = match if no other route matches within the same parent node
- * 
- * routechange event contains detail.matches, the array of matched parts of the regex
- */
-customElements.define('view-route', class extends HTMLElement {
-
-    #matches = [];
-
-    /** is this route currently active */
-    get isActive() {
-        return !!this.#matches?.length;
-    }
-
-    /** array of matched parts of the regex */
-    get matches() {
-        return this.#matches;
-    }
-
-    connectedCallback() {
-        this.style.display = 'contents';
-        routerEvents.addEventListener('popstate', this);
-        this.update();
-    }
-
-    disconnectedCallback() {
-        routerEvents.removeEventListener('popstate', this);
-    }
-
-    handleEvent(e) {
-        this.update();
-    }
-
-    static get observedAttributes() {
-        return ['path', 'exact'];
-    }
-
-    attributeChangedCallback() {
-        this.update();
-    }
-
-    update() {
-        let path = this.getAttribute('path') || '/';
-        // prepend absolute paths with the base path of the document (SPA behavior)
-        if (path.startsWith('/')) path = basePath + path;
-        const exact = this.hasAttribute('exact');
-        this.setMatches(this.matchesRoute(path, exact) || []);
-        if (this.isActive) {
-            this.dispatchEvent(new CustomEvent('routechange', { detail: this.matches, bubbles: true }));
-        }
-    }
-
-    setMatches(matches) {
-        this.#matches = matches;
-        this.style.display = this.isActive ? 'contents' : 'none';
-    }
-
-    matchesRoute(path, exact) {
-        let matches;
-        // '*' triggers fallback route if no other route matches
-        if (path === '*') {
-            const activeRoutes = Array.from(
-                this.parentNode.getElementsByTagName('view-route')
-                ).filter(_ => _.isActive);
-            if (!activeRoutes.length) matches = ['*'];
-        // normal routes
-        } else {
-            const regex = new RegExp(`^${path.replaceAll('/', '\\/')}${exact ? '$' : ''}`, 'gi');
-            const relativeUrl = location.pathname + location.search + location.hash;
-            matches = regex.exec(relativeUrl);
-        }
-        return matches;
-    }
-});
 
 const handleLinkClick = (e) => {
     const a = e.target.closest('a');
@@ -115,6 +30,15 @@ export const interceptNavigation = (root) => {
 }
 
 /**
+ * Notify routes on popstate (browser back/forward)
+ * @param {PopStateEvent} e 
+ */
+export const handlePopState = (e) => {
+    routerEvents.dispatchEvent(new PopStateEvent('popstate', { state: e.state }));
+}
+window.addEventListener('popstate', handlePopState);
+
+/**
  * Navigate to a new state and update routes
  * @param {*} state 
  * @param {*} unused 
@@ -124,3 +48,86 @@ export const pushState = (state, unused, url) => {
     history.pushState(state, unused, url);
     routerEvents.dispatchEvent(new PopStateEvent('popstate', { state }));
 }
+
+/**
+ * Match a path against the current document's location pathname (case-insensitive)
+ * @param {string} path The path to match, if started with a slash it is treated as relative to the document's URL
+ * @param {boolean} exact If true, the document's location must have no further path components
+ * @returns An array containing the matched path components, null if no match.
+ */
+export const matchesRoute = (path, exact) => {
+    const fullPath = path.startsWith('/') ? basePath + '(' + path + ')' : '(' + path + ')';
+    const regex = new RegExp(`^${fullPath.replaceAll('/', '\\/')}${exact ? '$' : ''}`, 'gi');
+    const relativeUrl = location.pathname;
+    return regex.exec(relativeUrl);
+}
+
+/**
+ * Usage:
+ * <view-route path="/(?:index.html)?" exact><p>hello</p><view-route> = only match / or /index.html and show the text "hello"
+ * <view-route path="/"> = match every route below / (e.g. for site navigation)
+ * <view-route path="/todos/([\w]+)"> = match #/todos/:id
+ * <view-route path="*"> = match if no other route matches within the same parent node
+ * 
+ * routechange event contains detail.matches, the array of matched parts of the regex
+ */
+customElements.define('view-route', class extends HTMLElement {
+
+    #matches = [];
+
+    get isActive() {
+        return !!this.#matches?.length;
+    }
+
+    get matches() {
+        return this.#matches;
+    }
+
+    set matches(v) {
+        this.#matches = v;
+        this.style.display = this.isActive ? 'contents' : 'none';
+        if (this.isActive) {
+            this.dispatchEvent(new CustomEvent('routechange', { detail: v, bubbles: true }));
+        }
+    }
+
+    connectedCallback() {
+        routerEvents.addEventListener('popstate', this);
+        this.update();
+    }
+
+    disconnectedCallback() {
+        routerEvents.removeEventListener('popstate', this);
+    }
+
+    handleEvent(e) {
+        this.update();
+    }
+
+    static get observedAttributes() {
+        return ['path', 'exact'];
+    }
+
+    attributeChangedCallback() {
+        this.update();
+    }
+
+    update() {
+        const path = this.getAttribute('path') || '/';
+        const exact = this.hasAttribute('exact');
+        this.matches = this.matchesRoute(path, exact) || [];
+    }
+
+    matchesRoute(path, exact) {
+        // '*' triggers fallback route if no other route on the same DOM level matches
+        if (path === '*') {
+            const activeRoutes = 
+                Array.from(this.parentNode.getElementsByTagName('view-route')).filter(_ => _.isActive);
+            if (!activeRoutes.length) return [location.pathname, '*'];
+        // normal routes
+        } else {
+            return matchesRoute(path, exact);
+        }
+        return null;
+    }
+});
